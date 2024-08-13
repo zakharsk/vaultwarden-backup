@@ -55,7 +55,7 @@ if [[ -n ${GPG_PASSPHRASE} ]]; then
     # https://gnupg.org/documentation/manuals/gnupg/GPG-Esoteric-Options.html
     # Note: Add `--pinentry-mode loopback` if using GnuPG 2.1.
     printf '%s' "${GPG_PASSPHRASE}" |
-    ${GPG} -c --cipher-algo "${GPG_CIPHER_ALGO}" --batch --passphrase-fd 0 "${BACKUP_FILE_PATH}"
+    ${GPG} -c --cipher-algo "${GPG_CIPHER_ALGO}" --batch --passphrase-fd 0 --pinentry-mode loopback "${BACKUP_FILE_PATH}"
     BACKUP_FILE_NAME+=".gpg"
     BACKUP_FILE_PATH+=".gpg"
     md5sum "${BACKUP_FILE_PATH}"
