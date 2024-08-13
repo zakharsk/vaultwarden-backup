@@ -1,9 +1,9 @@
 # Backup Vaultwarden data hourly.
-@hourly ${HOME}/vaultwarden/backup/cron.sh
+# @hourly ${HOME}/vaultwarden/backup/cron.sh
 
 # Backup Vaultwarden data hourly, using Healthchecks.io (https://healthchecks.io/) to monitor for failures.
 # This is just an example of using a cron monitoring service.
-# @hourly ${HOME}/vaultwarden/backup/cron.sh && curl -fsS -m 10 --retry 5 -o /dev/null https://hc-ping.com/<your-uuid>
+@daily ${HOME}/vaultwarden/backup/cron.sh && curl -fsS -m 10 --retry 5 -o /dev/null https://hc-ping.com/<your-uuid>
 
 # Purge old local backups.
 @daily find "${HOME}/vaultwarden/backup/archives" -name 'vaultwarden-*.tar.*' -mtime +14 -delete
