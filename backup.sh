@@ -6,7 +6,7 @@ set -ex
 # default if none exists.
 : ${VAULTWARDEN_ROOT:="$(realpath "${0%/*}"/..)"}
 : ${SQLITE3:="/usr/bin/sqlite3"}
-: ${RCLONE:="/usr/local/bin/rclone"}
+: ${RCLONE:="/usr/bin/rclone"}
 : ${GPG:="/usr/bin/gpg"}
 : ${AGE:="/usr/local/bin/age"}
 
