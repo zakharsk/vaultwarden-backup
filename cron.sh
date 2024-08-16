@@ -17,4 +17,6 @@ else
 fi
 
 cp -a "${BACKUP_ROOT}"/backup.log "${BACKUP_LOGS}"/backup-${RESULT}-${BACKUP_TIMESTAMP}.log
+rm "${BACKUP_ROOT}"/backup.log
+
 exit ${EXITCODE}

@@ -80,9 +80,61 @@ for dest in "${RCLONE_DESTS[@]}"; do
 done
 
 if [[ ${success} == ${#RCLONE_DESTS[@]} ]]; then
-    echo "Backup successfully copied to all destinations."
-    exit 0
+    rclone_message="✅ Backup successfully copied to all destinations."
+    rclone_result=0
 else
-    echo "Backup successfully copied to ${success} of ${#RCLONE_DESTS[@]} destinations."
-    exit 1
+    rclone_message="🆘 Backup copied to ${success} of ${#RCLONE_DESTS[@]} destinations."
+    rclone_result=1
+fi
+
+echo "$rclone_message"
+rclone_message=${rclone_message// /%20}
+rclone_message=${rclone_message//✅/%E2%9C%85}
+rclone_message=${rclone_message//🆘/%F0%9F%86%98}
+
+# Trying to reach the endpoint of the monitoring system
+monitor_result=0
+if [[ -n ${MONITOR_URL} && -n ${MONITOR_API} ]]; then
+  [[ $rclone_result == 0 ]] && status="up" || status="down"
+  monitor_request_url="${MONITOR_URL}${MONITOR_API}?status=${status}&msg=${rclone_message}"
+
+  if curl -fsS -m 10 --retry 5 -o /dev/null "${monitor_request_url}"; then
+    monitor_message="✅ Monitor URL ${MONITOR_URL} reached"
+    monitor_result=0
+  else
+    monitor_message="🆘 Monitor ${MONITOR_URL} unavailable"
+    monitor_result=1
+  fi
+
+  echo "$monitor_message"
+  monitor_message=${monitor_message// /%20}
+  monitor_message=${monitor_message//✅/%E2%9C%85}
+  monitor_message=${monitor_message//🆘/%F0%9F%86%98}
+fi
+
+# Trying to send a message via Telegram
+telegram_result=0
+if [[ -n ${TG_API_TOKEN} && -n ${TG_CHAT_ID} ]]; then
+  tg_api_base="https://api.telegram.org/bot"
+
+  tg_text="Vaultwarden%3A%0A${rclone_message}"
+  if [[ -n ${monitor_message} ]]; then tg_text="${tg_text}%0A${monitor_message}"; fi
+
+  tg_request_url="${tg_api_base}${TG_API_TOKEN}/sendMessage?chat_id=${TG_CHAT_ID}&text=${tg_text}&disable_web_page_preview=true"
+
+  if curl -fsS -m 10 --retry 5 -o /dev/null "${tg_request_url}"; then
+      telegram_message="✅ Telegram message for ${TG_CHAT_ID} sent"
+      telegram_result=0
+    else
+      telegram_message="🆘 Failed to send Telegram message for ${TG_CHAT_ID}"
+      telegram_result=1
+  fi
+  echo "${telegram_message}"
+fi
+
+
+if [[ ${rclone_result} == 1 || ${monitor_result} == 1 || ${telegram_result} == 1 ]]; then
+  exit 1
+else
+  exit 0
 fi

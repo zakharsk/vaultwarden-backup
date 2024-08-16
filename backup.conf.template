@@ -1,4 +1,4 @@
-#!sh
+#!/bin/bash
 
 #
 # Encryption options for GnuPG (https://www.gnupg.org/)
@@ -7,6 +7,20 @@
 GPG_CIPHER_ALGO=AES128
 GPG_PASSPHRASE='hunter2'
 
+# The same folder structure for all all destinations.
+BACKUPS_BUCKET="backups-bucket"
+BACKUPS_FOLDER="vaultwarden"
+BUCKET_PATH="$BACKUPS_BUCKET/$BACKUPS_FOLDER"
+
+# Monitor
+#MONITOR_URL="https://hc-ping.com"
+#MONITOR_API="/your-uuid"
+
+# Telegram bot
+TELEGRAM_API_TOKEN=""
+TELEGRAM_CHAT_ID=""
+
+
 #
 # Encryption options for age (https://github.com/FiloSottile/age)
 # Uncomment to enable age encryption.
@@ -14,8 +28,9 @@ GPG_PASSPHRASE='hunter2'
 # AGE_PASSPHRASE='hunter2'
 
 RCLONE_DESTS=(
-    # Backblaze B2 (https://rclone.org/b2/)
-    b2:vaultwarden
-    # Oracle Cloud Infrastructure (https://docs.oracle.com/en/solutions/move-data-to-cloud-storage-using-rclone/)
-    oci:vaultwarden
+  # Cloudflare R2 Storage https://developers.cloudflare.com/r2/
+  cloudflare:"$BUCKET_PATH"
+
+  # Oracle Object Storage https://docs.oracle.com/en-us/iaas/Content/Object/home.htm
+  oracle:"$BUCKET_PATH"
 )
